@@ -28,8 +28,6 @@
 
 class Viewer : public QGLWidget {
  public:
-  Viewer(char *filename,
-	 const QGLFormat &format=QGLFormat::defaultFormat());
   Viewer(const QGLFormat &format=QGLFormat::defaultFormat());
   ~Viewer();
   
@@ -44,16 +42,14 @@ class Viewer : public QGLWidget {
  private:
   void createVAO();
   void deleteVAO();
-  void drawObject(const glm::vec3 &pos,const glm::vec3 &col);
-  void drawQuad();
+  void drawVAO();
 
   void createShaders();
-  void deleteShaders();
+  void enableShader(unsigned int shader=0);
   void disableShader();
 
-  void createFBO();
-  void deleteFBO();
-  void initFBO();
+  void createTextures();
+  void deleteTextures();
 
   QTimer        *_timer;    // timer that controls the animation
   unsigned int   _currentshader; // current shader index
@@ -65,27 +61,16 @@ class Viewer : public QGLWidget {
   glm::vec3 _light; // light direction
   bool      _mode;  // camera motion or light motion
 
-  Shader *_shaderNoise; // shader used to draw Noise
-  Shader *_shaderNormal; // shader used to draw Normal
-  Shader *_shaderMountain; // shader used to create the Mountain geometry
-  Shader *_shaderShadow; //shader used to create the shadowMap of the mountain
-  Shader *_shaderPost; //shader dedicated to the Post process
+  std::vector<std::string> _vertexFilenames;   // all vertex filenames
+  std::vector<std::string> _fragmentFilenames; // all fragment filenames
+  std::vector<Shader *>    _shaders;           // all the shaders 
 
-  // vao/vbo ids (1 for the object, 1 for the viewport quad)
-  GLuint _vaoObject;
-  GLuint _vaoQuad;
-  GLuint _buffers[5];
-  GLuint _quad;
+  // vao/vbo ids 
+  GLuint _vao;
+  GLuint _buffers[4];
 
-  // render texture ids 
-  GLuint _rendNormalId;
-  GLuint _rendShadowsId;
-  GLuint _rendDepthId;
-
-  // fbo id
-  GLuint _fboNoise;
-  GLuint _fboShadow;
-  GLuint _fboOther;
+  // texture id 
+  GLuint _texIds[2];
 };
 
 #endif // VIEWER_H

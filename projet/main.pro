@@ -1,8 +1,7 @@
 GLM_PATH  = ../../ext/glm-0.9.4.1
 
 TEMPLATE  = app
-TARGET    = tp07
-
+TARGET    = projetImg
 
 LIBS     += -lGLEW -lGL -lGLU -lm
 INCLUDEPATH  += $${GLM_PATH}

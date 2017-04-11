@@ -13,6 +13,11 @@ class Grid {
 
   inline float *vertices() {return &_vertices[0];}
   inline int   *faces   () {return &_faces[0];   }
+
+  // info
+  float         center[3];
+  float         radius;
+
  
  private:
   unsigned int _nbVertices;
@@ -20,6 +25,9 @@ class Grid {
 
   std::vector<float> _vertices;
   std::vector<int>   _faces;
+
+
+
 };
 
 #endif //GRID_H

@@ -24,11 +24,9 @@ int main(int argc,char** argv) {
   fmt.setProfile(QGLFormat::CoreProfile);
   fmt.setSampleBuffers(true);
   
-  //Viewer viewer(getFilename(argc,argv),fmt);
-
   Viewer viewer(fmt);
 
-  viewer.setWindowTitle("Projet - Générateur de terrain procédurale");
+  viewer.setWindowTitle("Projet simulation Image");
   viewer.show();
   
   return application.exec();

@@ -1,5 +1,9 @@
 #include "grid.h"
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+
 using namespace std;
 
 Grid::Grid(unsigned int size,float minval,float maxval) {
@@ -10,6 +14,12 @@ Grid::Grid(unsigned int size,float minval,float maxval) {
   const float stepH  = h/(float)size;
   const float startx = minval;
   const float starty = minval;
+
+  float r;
+
+  int i;
+
+  float c[3] = {0.0,0.0,0.0};
 
   for(unsigned int i=0;i<size;++i) {
     for(unsigned int j=0;j<size;++j) {
@@ -37,8 +47,30 @@ Grid::Grid(unsigned int size,float minval,float maxval) {
     }
   }
 
+
   _nbVertices = _vertices.size()/3;
   _nbFaces    = _faces.size()/3;
+
+  // computing center
+  for(i=0;i<_nbVertices*3;i+=3) {
+    c[0] += _vertices[i  ];
+    c[1] += _vertices[i+1];
+    c[2] += _vertices[i+2];
+  }
+  center[0] = c[0]/(float)_nbVertices;
+  center[1] = c[1]/(float)_nbVertices;
+  center[2] = c[2]/(float)_nbVertices;
+
+  // computing radius
+  radius = 0.0;
+  for(i=0;i<_nbVertices*3;i+=3) {
+    c[0] = _vertices[i  ]-center[0];
+    c[1] = _vertices[i+1]-center[1];
+    c[2] = _vertices[i+2]-center[2];
+
+    r = sqrt(c[0]*c[0]+c[1]*c[1]+c[2]*c[2]);
+    radius = r>radius ? r : radius;
+  }
 }
 
 Grid::~Grid() {
