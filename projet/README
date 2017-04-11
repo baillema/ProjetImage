@@ -1,0 +1,15 @@
+A envoyer sous format:
+sujet:
+[M1 INFO-SI] Projet
+
+nom1_nom2_nom3_nom4.zip
+     |
+     -------->/sources
+     |          |
+     |          --------> /shaders
+     |          |             |
+     |          |             --------> *.vert
+     |          |             --------> *.frag
+     |          --------> *.cpp
+     |          --------> *.h
+     -------->nom1_nom2_nom3_nom4.pdf //rapport
