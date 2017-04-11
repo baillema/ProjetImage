@@ -23,6 +23,21 @@ Viewer::Viewer(char *filename,const QGLFormat &format)
   connect(_timer,SIGNAL(timeout()),this,SLOT(updateGL()));
 }
 
+Viewer::Viewer(const QGLFormat &format)
+  : QGLWidget(format),
+    _timer(new QTimer(this)),
+    _currentshader(0),
+    _light(glm::vec3(0,0,1)),
+    _mode(false) {
+
+  setlocale(LC_ALL,"C");
+
+  _cam = new Camera();
+
+  _timer->setInterval(10);
+  connect(_timer,SIGNAL(timeout()),this,SLOT(updateGL()));
+}
+
 Viewer::~Viewer() {
   delete _timer;
   delete _mesh;
@@ -171,6 +186,15 @@ void Viewer::createVAO() {
 
   // back to normal
   glBindVertexArray(0);
+}
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void Viewer::deleteVAO() {
+  glDeleteBuffers(2,_terrain);
+  glDeleteBuffers(1,&_quad);
+  glDeleteVertexArrays(1,&_vaoTerrain);
+  glDeleteVertexArrays(1,&_vaoQuad);
 }
 
 //FINI

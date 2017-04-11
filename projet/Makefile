@@ -33,7 +33,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = tp071.0.0
-DISTDIR = /home/b/baillema/Desktop/Cours/SIM/TP7/TP07/.tmp/tp071.0.0
+DISTDIR = /home/b/baillema/Desktop/Cours/SIM/Project/ProjetImage/projet/.tmp/tp071.0.0
 LINK          = g++
 LFLAGS        = -m64 -Wl,-O1
 LIBS          = $(SUBLIBS) -L/usr/X11R6/lib64 -lGLEW -lGLU -lm -lGL -lQt5OpenGL -lQt5Widgets -lQt5Gui -lQt5Xml -lQt5Core -lpthread 
@@ -53,13 +53,15 @@ SOURCES       = shader.cpp \
 		trackball.cpp \
 		camera.cpp \
 		main.cpp \
-		viewer.cpp 
+		viewer.cpp \
+		grid.cpp 
 OBJECTS       = shader.o \
 		meshLoader.o \
 		trackball.o \
 		camera.o \
 		main.o \
-		viewer.o
+		viewer.o \
+		grid.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -121,12 +123,14 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		meshLoader.h \
 		trackball.h \
 		camera.h \
-		viewer.h shader.cpp \
+		viewer.h \
+		grid.h shader.cpp \
 		meshLoader.cpp \
 		trackball.cpp \
 		camera.cpp \
 		main.cpp \
-		viewer.cpp
+		viewer.cpp \
+		grid.cpp
 QMAKE_TARGET  = tp07
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = tp07
@@ -298,13 +302,14 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents shader.h meshLoader.h trackball.h camera.h viewer.h $(DISTDIR)/
-	$(COPY_FILE) --parents shader.cpp meshLoader.cpp trackball.cpp camera.cpp main.cpp viewer.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents shader.h meshLoader.h trackball.h camera.h viewer.h grid.h $(DISTDIR)/
+	$(COPY_FILE) --parents shader.cpp meshLoader.cpp trackball.cpp camera.cpp main.cpp viewer.cpp grid.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
 	-$(DEL_FILE) $(OBJECTS)
 	-$(DEL_FILE) *~ core *.core
+	-$(DEL_FILE) *.o
 
 
 distclean: clean 
@@ -373,7 +378,8 @@ main.o: main.cpp viewer.h \
 		mat4.h \
 		vec4.h \
 		meshLoader.h \
-		shader.h
+		shader.h \
+		grid.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 viewer.o: viewer.cpp viewer.h \
@@ -386,8 +392,12 @@ viewer.o: viewer.cpp viewer.h \
 		mat4.h \
 		vec4.h \
 		meshLoader.h \
-		shader.h
+		shader.h \
+		grid.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o viewer.o viewer.cpp
+
+grid.o: grid.cpp grid.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o grid.o grid.cpp
 
 ####### Install
 

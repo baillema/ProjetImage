@@ -24,11 +24,13 @@
 #include "camera.h"
 #include "meshLoader.h"
 #include "shader.h"
+#include "grid.h"
 
 class Viewer : public QGLWidget {
  public:
   Viewer(char *filename,
 	 const QGLFormat &format=QGLFormat::defaultFormat());
+  Viewer(const QGLFormat &format=QGLFormat::defaultFormat());
   ~Viewer();
   
  protected :
@@ -58,6 +60,7 @@ class Viewer : public QGLWidget {
 
   Mesh   *_mesh;   // the mesh
   Camera *_cam;    // the camera
+  Grid *_grid;
 
   glm::vec3 _light; // light direction
   bool      _mode;  // camera motion or light motion
