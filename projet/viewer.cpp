@@ -38,31 +38,68 @@ Viewer::~Viewer() {
   deleteTextures();
 }
 
-void Viewer::createTextures() {
-  QImage image = QGLWidget::convertToGLFormat(QImage("/home/b/baillema/Desktop/Cours/SIM/TP5/TP05/textures/ice_cold.png"));
 
-  // enable the use of 2D textures 
-  glEnable(GL_TEXTURE_2D);
+void Viewer::loadTexture(GLuint id,const char *filename) {
+  // load image
+  QImage image = QGLWidget::convertToGLFormat(QImage(filename));
 
-  // (see exercice 2)
-  glGenTextures(1,&(_texIds[0]));
-  glBindTexture(GL_TEXTURE_2D,_texIds[0]);
+  // activate texture
+  glBindTexture(GL_TEXTURE_2D,id);
 
-  //glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA32F,image.width(),image.height(),0,GL_RGBA,GL_UNSIGNED_BYTE,image.bits());
-  glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA32F,image.width(),image.height(),0,GL_RGBA,GL_UNSIGNED_BYTE,image.bits());
+  // set texture parameters
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_MIRRORED_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_MIRRORED_REPEAT);
 
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR); // choose the filtering mode for minification
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // choose the filtering mode for magnification
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_MIRRORED_REPEAT); // choose the border mode in the U direction
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_MIRRORED_REPEAT); // choose the border mode in the V direction
+  // store texture in the GPU
+  glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,image.width(),image.height(),0,
+           GL_RGBA,GL_UNSIGNED_BYTE,(const GLvoid *)image.bits());
 
+  // generate mipmaps
   glGenerateMipmap(GL_TEXTURE_2D);
 }
 
+void Viewer::createTextures() {
+
+  glGenTextures(1, _texIds);
+
+  loadTexture(_texIds[0],"textures/ice_cold.png");
+
+}
+
 void Viewer::deleteTextures() {
-  // (see exercice 2)
   glDeleteTextures(1,&(_texIds[0]));
 }
+
+/* Final createVAO
+void Viewer::createVAO() {
+  //the variable _grid should be an instance of Grid
+
+  const GLfloat quadData[] = {
+    -1.0f,-1.0f,0.0f, 1.0f,-1.0f,0.0f, -1.0f,1.0f,0.0f, -1.0f,1.0f,0.0f, 1.0f,-1.0f,0.0f, 1.0f,1.0f,0.0f };
+
+  glGenBuffers(2,_terrain);
+  glGenBuffers(1,&_quad);
+  glGenVertexArrays(1,&_vaoTerrain);
+  glGenVertexArrays(1,&_vaoQuad);
+
+  // create the VBO associated with the grid (the terrain)
+  glBindVertexArray(_vaoTerrain);
+  glBindBuffer(GL_ARRAY_BUFFER,_terrain[0]); // vertices
+  glBufferData(GL_ARRAY_BUFFER,_grid->nbVertices()*3*sizeof(float),_grid->vertices(),GL_STATIC_DRAW);
+  glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,(void *)0);
+  glEnableVertexAttribArray(0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,_terrain[1]); // indices
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER,_grid->nbFaces()*3*sizeof(int),_grid->faces(),GL_STATIC_DRAW);
+
+  // create the VBO associated with the screen quad
+  glBindVertexArray(_vaoQuad);
+  glBindBuffer(GL_ARRAY_BUFFER,_quad); // vertices
+  glBufferData(GL_ARRAY_BUFFER, sizeof(quadData),quadData,GL_STATIC_DRAW);
+  glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,(void *)0);
+  glEnableVertexAttribArray(0);
+}*/
 
 void Viewer::createVAO() {
   // create some buffers inside the GPU memory
@@ -78,19 +115,6 @@ void Viewer::createVAO() {
   glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,(void *)0);
   glEnableVertexAttribArray(0);
 
-  // store mesh normals into buffer 1 inside the GPU memory
-  /*
-  glBindBuffer(GL_ARRAY_BUFFER,_buffers[1]);
-  glBufferData(GL_ARRAY_BUFFER,_mesh->nb_vertices*3*sizeof(float),_mesh->normals,GL_STATIC_DRAW);
-  glVertexAttribPointer(1,3,GL_FLOAT,GL_TRUE,0,(void *)0);
-  glEnableVertexAttribArray(1);
-
-  // store coordinates
-  glBindBuffer(GL_ARRAY_BUFFER,_buffers[2]);
-  glBufferData(GL_ARRAY_BUFFER,_mesh->nb_vertices*2*sizeof(float),_mesh->coords,GL_STATIC_DRAW);
-  glVertexAttribPointer(2,2,GL_FLOAT,GL_TRUE,0,(void *)0);
-  glEnableVertexAttribArray(2);
-  */
   // store grid indices into buffer 3 inside the GPU memory
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,_buffers[3]);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,_grid->nbFaces()*3*sizeof(unsigned int),_grid->faces(),GL_STATIC_DRAW);
@@ -103,6 +127,13 @@ void Viewer::deleteVAO() {
   glDeleteBuffers(4,_buffers);
   glDeleteVertexArrays(1,&_vao);
 }
+/* finale deleteVAO
+void Viewer::deleteVAO() {o
+  glDeleteBuffers(2,_terrain);
+  glDeleteBuffers(1,&_quad);
+  glDeleteVertexArrays(1,&_vaoTerrain);
+  glDeleteVertexArrays(1,&_vaoQuad);
+}*/
 
 void Viewer::drawVAO() {
   // activate the VAO, draw the associated triangles and desactivate the VAO
@@ -112,11 +143,13 @@ void Viewer::drawVAO() {
 }
 
 void Viewer::createShaders() {
-  // add your own shader files here 
-
-  // *** Phong shader *** 
+  // *** Noise shader ***
   _vertexFilenames.push_back("shaders/noise.vert");
   _fragmentFilenames.push_back("shaders/noise.frag");
+
+  // *** Normal shader ***
+  _vertexFilenames.push_back("shaders/normal.vert");
+  _fragmentFilenames.push_back("shaders/normal.frag");
 
 }
 
@@ -139,12 +172,11 @@ void Viewer::enableShader(unsigned int shader) {
   // send a light direction (defined in camera space)
   glUniform3fv(glGetUniformLocation(id,"light"),1,&(_light[0]));
 
-  // send the link to your texture here
-  // (see exercice 3)
+  // send textures
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D,_texIds[0]);
   glGenerateMipmap(GL_TEXTURE_2D);
-  glUniform1i(glGetUniformLocation(id,"texturing"),0);
+  glUniform1i(glGetUniformLocation(id,"heightmap"),0);
 
 }
 

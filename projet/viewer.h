@@ -40,6 +40,7 @@ class Viewer : public QGLWidget {
   virtual void mouseMoveEvent(QMouseEvent *me);
 
  private:
+  void loadTexture(GLuint id,const char *filename);
   void createVAO();
   void deleteVAO();
   void drawVAO();
@@ -71,6 +72,11 @@ class Viewer : public QGLWidget {
 
   // texture id 
   GLuint _texIds[2];
+
+  GLuint _vaoTerrain;
+  GLuint _vaoQuad;
+  GLuint _terrain[2];
+  GLuint _quad;
 };
 
 #endif // VIEWER_H
