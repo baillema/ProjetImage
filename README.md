@@ -1,3 +1,7 @@
+# Mail des auteurs :
+mathieu.baille@gmail.com
+jerromeferrafiat@aol.com
+
 # ProjetImage
 Projet de simulation d'image
 
