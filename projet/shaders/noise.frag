@@ -2,7 +2,7 @@
 
 in vec2 pos;
 
-out vec4 outBuffer;
+out vec4 outbuffer;
 
 vec2 hash(vec2 p) {
   p = vec2( dot(p,vec2(127.1,311.7)),
@@ -16,7 +16,7 @@ float gnoise(in vec2 p) {
   vec2 f = fract( p );
    
   vec2 u = f*f*(3.0-2.0*f);
- 
+
   return mix( mix( dot( hash( i + vec2(0.0,0.0) ), f - vec2(0.0,0.0) ),
            dot( hash( i + vec2(1.0,0.0) ), f - vec2(1.0,0.0) ), u.x),
           mix( dot( hash( i + vec2(0.0,1.0) ), f - vec2(0.0,1.0) ),
@@ -39,8 +39,8 @@ float pnoise(in vec2 p,in float amplitude,in float frequency,in float persistenc
 
 
 void main() {
-  vec3 motion = vec3(0.); // could be controlled via a global uniform variable
+  vec3 motion = vec3(0.); // could be controlled via a global uniform variable ***
   float p = pnoise(pos+motion.xy,2.0,4.0,0.5,10)+motion.z;
 
-  outBuffer = vec4(p*0.5+0.5);
+  outbuffer = vec4(p*0.5+0.5);
 }

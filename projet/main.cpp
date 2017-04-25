@@ -1,5 +1,5 @@
 #include <qapplication.h>
-#include <QString>
+//#include <QString>
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -25,10 +25,9 @@ int main(int argc,char** argv) {
   fmt.setSampleBuffers(true);
   
   //Viewer viewer(getFilename(argc,argv),fmt);
-
   Viewer viewer(fmt);
 
-  viewer.setWindowTitle("Projet - Générateur de terrain procédurale");
+  viewer.setWindowTitle("Projet - Generateur de terrain procedurale");
   viewer.show();
   
   return application.exec();

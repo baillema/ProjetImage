@@ -6,23 +6,6 @@
 
 using namespace std;
 
-
-Viewer::Viewer(char *filename,const QGLFormat &format)
-  : QGLWidget(format),
-    _timer(new QTimer(this)),
-    _currentshader(0),
-    _light(glm::vec3(0,0,1)),
-    _mode(false) {
-
-  setlocale(LC_ALL,"C");
-
-  _mesh = new Mesh(filename);
-  _cam  = new Camera(_mesh->radius,glm::vec3(_mesh->center[0],_mesh->center[1],_mesh->center[2]));
-
-  _timer->setInterval(10);
-  connect(_timer,SIGNAL(timeout()),this,SLOT(updateGL()));
-}
-
 Viewer::Viewer(const QGLFormat &format)
   : QGLWidget(format),
     _timer(new QTimer(this)),
@@ -37,6 +20,7 @@ Viewer::Viewer(const QGLFormat &format)
   _timer->setInterval(10);
   connect(_timer,SIGNAL(timeout()),this,SLOT(updateGL()));
 }
+
 
 Viewer::~Viewer() {
   delete _timer;
@@ -59,12 +43,12 @@ void Viewer::deleteVAO() {
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 void Viewer::createFBO() {
   // Ids needed for the FBO and associated textures 
   glGenFramebuffers(1,&_fboNoise);
+
   glGenTextures(1,&_rendNormalId);
-  //glGenTextures(1,&_rendColorId);
+  glGenTextures(1,&_rendColorId);
   glGenTextures(1,&_rendDepthId);
 }
 
@@ -73,14 +57,13 @@ void Viewer::createFBO() {
 void Viewer::initFBO() {
 
  // create the texture for rendering colors
-    /*
   glBindTexture(GL_TEXTURE_2D,_rendColorId);
   glTexImage2D(GL_TEXTURE_2D, 0,GL_RGBA32F,width(),height(),0,GL_RGBA,GL_FLOAT,NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  */
+  glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,_rendColorId,0);
 
   // create the texture for rendering normals 
   glBindTexture(GL_TEXTURE_2D,_rendNormalId);
@@ -100,8 +83,8 @@ void Viewer::initFBO() {
 
   // attach textures to framebuffer object 
   glBindFramebuffer(GL_FRAMEBUFFER,_fboNoise);
-  //glBindTexture(GL_TEXTURE_2D,_rendColorId);
-  //glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,_rendColorId,0);
+  glBindTexture(GL_TEXTURE_2D,_rendColorId);
+  glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,_rendColorId,0);
   glBindTexture(GL_TEXTURE_2D,_rendNormalId);
   glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT1,GL_TEXTURE_2D,_rendNormalId,0);
   glBindTexture(GL_TEXTURE_2D,_rendDepthId);
@@ -188,15 +171,6 @@ void Viewer::createVAO() {
   glBindVertexArray(0);
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-void Viewer::deleteVAO() {
-  glDeleteBuffers(2,_terrain);
-  glDeleteBuffers(1,&_quad);
-  glDeleteVertexArrays(1,&_vaoTerrain);
-  glDeleteVertexArrays(1,&_vaoQuad);
-}
-
 //FINI
 
 void Viewer::createShaders() {
@@ -238,7 +212,7 @@ void Viewer::deleteShaders() {
 
 void Viewer::drawObject(const glm::vec3 &pos,const glm::vec3 &col) {
   // shader id
-  const int id = _shaderNoise->id();
+  const int id = _shaderNormal->id();
 
   // send uniform (constant) variables to the shader 
   glm::mat4 mdv = glm::translate(_cam->mdvMatrix(),pos);
@@ -253,11 +227,11 @@ void Viewer::drawObject(const glm::vec3 &pos,const glm::vec3 &col) {
   glBindVertexArray(0);
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-/*
+//-----------------------------------------------------first-pass------------------------------------------------------------------------------------------------------------------------------------------------------
+
 void Viewer::drawQuad() {
   // shader id
-  const int id = _shaderSecondPass->id();
+  const int id = _shaderNormal->id();
 
   // send shader parameters 
   glUniform3fv(glGetUniformLocation(id,"light"),1,&(_light[0]));
@@ -275,7 +249,7 @@ void Viewer::drawQuad() {
   glBindVertexArray(_vaoQuad);
   glDrawArrays(GL_TRIANGLES,0,6);
   glBindVertexArray(0);
-}*/
+}
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -325,10 +299,10 @@ void Viewer::paintGL() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // activate the shader 
-  //glUseProgram(_shaderSecondPass->id());
+  glUseProgram(_shaderNoise->id());
 
   // Draw the triangles !
-  //drawQuad();
+  drawQuad();
 
   // disable shader 
   glUseProgram(0);
@@ -402,11 +376,12 @@ void Viewer::keyPressEvent(QKeyEvent *ke) {
   // key i: init camera
   if(ke->key()==Qt::Key_I) {
     _cam->initialize(width(),height(),true);
+
   }
   
   // key r: reload shaders 
-  _shaderNoise->reload("shaders/first-pass.vert","shaders/first-pass.frag");
-  //_shaderSecondPass->reload("shaders/second-pass.vert","shaders/second-pass.frag");
+  _shaderNoise->reload("shaders/noise.vert","shaders/noise.frag");
+  //_shaderNormal->reload("shaders/normal.vert","shaders/normal.frag");
 
   updateGL();
 }

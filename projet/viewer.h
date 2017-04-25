@@ -23,13 +23,11 @@
 
 #include "camera.h"
 #include "meshLoader.h"
-#include "shader.h"
 #include "grid.h"
+#include "shader.h"
 
 class Viewer : public QGLWidget {
  public:
-  Viewer(char *filename,
-	 const QGLFormat &format=QGLFormat::defaultFormat());
   Viewer(const QGLFormat &format=QGLFormat::defaultFormat());
   ~Viewer();
   
@@ -71,6 +69,7 @@ class Viewer : public QGLWidget {
   Shader *_shaderShadow; //shader used to create the shadowMap of the mountain
   Shader *_shaderPost; //shader dedicated to the Post process
 
+
   // vao/vbo ids (1 for the object, 1 for the viewport quad)
   GLuint _vaoObject;
   GLuint _vaoQuad;
@@ -81,6 +80,8 @@ class Viewer : public QGLWidget {
   GLuint _rendNormalId;
   GLuint _rendShadowsId;
   GLuint _rendDepthId;
+  GLuint _rendColorId;
+  GLuint _texIds[2];
 
   // fbo id
   GLuint _fboNoise;
